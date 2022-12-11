@@ -5,7 +5,6 @@ include "mlir/IR/OpBase.td"
 include "mlir/Pass/PassBase.td"
 include "mlir/Dialect/StandardOps/IR/Ops.td"
 include "Dialect/Quantum/QuantumOps.td"
-
 // def : Pat<(CNOTGateOp
 //             (CNOTGateOp $q0, $q1):$res0__0)
 //             (CNOTGateOp $q0, $q1):$res1__1)),
@@ -25,28 +24,29 @@ def : Pat<(RotateYOp $beta, (RotateYOp $alpha, $q)), (RotateYOp (AddFOp $alpha, 
 def : Pat<(RotateZOp $beta, (RotateZOp $alpha, $q)), (RotateZOp (AddFOp $alpha, $beta), $q)>;
 
 // Merge adjacent U ops, if all angles are constants
-// class mergeZYZ<component> : NativeCodeCall<"convertYZYtoZYZ($0, $1, $2)." # component # "()">;
-
+def ZYZa1 : NativeCodeCall<"EulerAngles::wrapZYZa1($_builder, $0, $1, $2, $3)">;
+def ZYZa2 : NativeCodeCall<"EulerAngles::wrapZYZa2($_builder, $0, $1, $2, $3)">;
+def ZYZa3 : NativeCodeCall<"EulerAngles::wrapZYZa3($_builder, $0, $1, $2, $3)">;
 // U(...).U(...) = U(...)
 // U(theta, phi, lambda)
 //           = U(theta2, phi2, lambda2).U(theta1, phi1, lambda1)
-//           = Rz(phi2).Ry(theta2).Rz(lambda2+phi1).Ry(theta1).Rz(lambda1)
-//           = Rz(phi2).Rz(phi').Ry(theta').Rz(lambda').Rz(lambda1)
-//           = U(theta', phi2 + phi', lambda1 + lambda')
-// def : Pat<(UniversalRotationGateOp
-//             (ConstantFloatOp $theta2),
-//             $phi2,
-//             (ConstantFloatOp $lambda2),
-//             (UniversalRotationGateOp
-//                (ConstantFloatOp $theta1),
-//                (ConstantFloatOp $phi1),
-//                $lambda1,
-//                $q)),
-//           (UniversalRotationGateOp
-//              (ConstantFloatOp (mergeZYZ<theta> theta1, theta2, lambda1)),
-//              (AddFOp phi2, (ConstantFloatOp (mergeZYZ<phi>))),
-//              (AddFOp lambda1, (ConstantFloatOp (mergeZYZ<lambda>))),
-//              $q)>;
+//           = Rz(lambda2).Ry(theta2).Rz(phi2+lambda1).Ry(theta1).Rz(phi1)
+//           = Rz(lambda2).Rz(lambda').Ry(theta').Rz(phi').Rz(phi1)
+//           = U(theta', phi1 + phi', lambda2 + lambda')
+def : Pat<(UniversalRotationGateOp
+            (ConstantOp $theta2),
+            (ConstantOp $phi2),
+            $lambda2,
+            (UniversalRotationGateOp
+               (ConstantOp $theta1),
+               $phi1,
+               (ConstantOp $lambda1),
+               $q)),
+          (UniversalRotationGateOp
+             (ConstantOp (ZYZa2 $theta1, $phi2, $lambda1, $theta2)),
+             (AddFOp $phi1, (ConstantOp (ZYZa1 $theta1, $phi2, $lambda1, $theta2))),
+             (AddFOp $lambda2, (ConstantOp (ZYZa3 $theta1, $phi2, $lambda1, $theta2))),
+             $q)>;
 
 // https://qiskit.org/documentation/stubs/qiskit.transpiler.passes.RemoveDiagonalGatesBeforeMeasure.html
 def : Pat<(Quantum_MeasureOp (RotateZOp $param, $q)), (Quantum_MeasureOp $q)>;

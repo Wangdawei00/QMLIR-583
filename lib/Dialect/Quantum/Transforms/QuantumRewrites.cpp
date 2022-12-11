@@ -41,12 +41,12 @@ static RotationMatrix RotationZ(double t) {
 }
 
 RotationMatrix operator*(const RotationMatrix &m1, const RotationMatrix &m2) {
-  RotationMatrix m;
+  RotationMatrix m = {{0,0,0},{0,0,0},{0,0,0}};
   for (unsigned i = 0; i < 3; i++) {
     for (unsigned j = 0; j < 3; j++) {
       m[i][j] = 0.0;
       for (unsigned k = 0; k < 3; k++) {
-        m[i][j] = m1[i][k] * m2[k][j];
+        m[i][j] += m1[i][k] * m2[k][j];
       }
     }
   }
@@ -100,30 +100,6 @@ Attribute EulerAngles::wrapZYZa3(Builder &builder, Attribute y1, Attribute z11, 
 }
 
 
-
-// U(theta, phi, lambda)
-//           = U(theta2, phi2, lambda2).U(theta1, phi1, lambda1)
-//           = Rz(phi2).Ry(theta2).Rz(lambda2+phi1).Ry(theta1).Rz(lambda1)
-//           = Rz(phi2).Rz(phi').Ry(theta').Rz(lambda').Rz(lambda1)
-//           = U(theta', phi2 + phi', lambda1 + lambda')
-class UOpMergePattern : public OpRewritePattern<UniversalRotationGateOp> {
-public:
-  using OpRewritePattern::OpRewritePattern;
-
-  LogicalResult matchAndRewrite(UniversalRotationGateOp uOp,
-                                PatternRewriter &rewriter) const final {
-    auto parentUOp = uOp.qinp().getDefiningOp<UniversalRotationGateOp>();
-    if (!parentUOp)
-      return failure();
-
-    /// Dummy implementation for testing only
-    /// TODO: implement proper merge: U.U
-    rewriter.replaceOp(uOp, parentUOp.qout());
-
-    return success();
-  }
-};
-
 // %b1, %a1 = CNOT %b0, %a0
 // %a2, %b2 = CNOT %a1, %b1
 // -----
@@ -150,7 +126,7 @@ struct AlternateCNOTPattern : public OpRewritePattern<CNOTGateOp> {
 void QuantumRewritePass::runOnFunction() {
   OwningRewritePatternList patterns(&getContext());
   populateWithGenerated(patterns);
-  patterns.insert<UOpMergePattern, AlternateCNOTPattern>(&getContext());
+  patterns.insert<AlternateCNOTPattern>(&getContext());
   if (failed(
           applyPatternsAndFoldGreedily(getFunction(), std::move(patterns)))) {
     signalPassFailure();

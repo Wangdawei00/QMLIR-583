@@ -19,6 +19,11 @@ def QuantumPrepareForZXPass : FunctionPass<"qssa-prepare-for-zx"> {
   let constructor = "mlir::createQuantumPrepareForZXPass()";
 }
 
+def ToyPass : FunctionPass<"toy-pass"> {
+  let summary = "Toy for testing";
+  let constructor = "mlir::createToyPass()";
+}
+
 // Dynamic Analysis (with updates)
 def QuantumDepthComputePass : FunctionPass<"qssa-compute-depths"> {
   let summary = "Compute circuit depth for all operations";

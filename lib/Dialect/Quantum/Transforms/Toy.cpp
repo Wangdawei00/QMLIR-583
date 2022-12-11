@@ -18,11 +18,14 @@ class ToyPass : public ToyPassBase<ToyPass> {
 
 void ToyPass::runOnFunction() {
   FuncOp f = getOperation();
-  f.walk([](Operation *op) {
-    OperationName name = op->getName();
-    if (is_class<PauliXGateOp>::name) {
-      return success();
+  f.walk([&](Operation *op) {
+    // OperationName name = op->getName();
+    if (isa<PauliXGateOp>(op)) {
+      
+    }else{
+      // return failure();
     }
+    return WalkResult::advance();
   }); 
 }
 

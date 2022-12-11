@@ -17,8 +17,13 @@ class ToyPass : public ToyPassBase<ToyPass> {
 
 
 void ToyPass::runOnFunction() {
-  auto f = getFunction();
-  
+  FuncOp f = getOperation();
+  f.walk([](Operation *op) {
+    OperationName name = op->getName();
+    if (is_class<PauliXGateOp>::name) {
+      return success();
+    }
+  }); 
 }
 
 namespace mlir {

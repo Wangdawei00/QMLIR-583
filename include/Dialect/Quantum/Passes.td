@@ -29,6 +29,11 @@ def ConstantFoldingPass: FunctionPass<"constant-folding">{
   let constructor = "mlir::createConstantFoldingPass()";
 }
 
+def DeadCodeEliminationPass: Pass<"dead-code-elimination">{
+  let summary="dead code elimination";
+  let constructor = "mlir::createDeadCodeEliminationPass()";
+}
+
 // Dynamic Analysis (with updates)
 def QuantumDepthComputePass : FunctionPass<"qssa-compute-depths"> {
   let summary = "Compute circuit depth for all operations";

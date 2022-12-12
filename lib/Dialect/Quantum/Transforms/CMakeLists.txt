@@ -3,6 +3,7 @@ add_mlir_dialect_library(QuantumTransforms
     Convert1QToU.cpp
     PrepareForZX.cpp
     Toy.cpp
+    ConstantFolding.cpp
 
     ADDITIONAL_HEADER_DIRS
     ${PROJECT_SOURCE_DIR}/include/Dialect/Quantum/Transforms
@@ -13,6 +14,7 @@ add_mlir_dialect_library(QuantumTransforms
     MLIRQuantumConvert1QToUPassIncGen
     MLIRQuantumPrepareForZXPassIncGen
     MLIRZXTransformsRewritesPassIncGen
+    MLIRConstantFoldingPassIncGen
     )
 
 target_link_libraries(QuantumTransforms PUBLIC MLIRIR)

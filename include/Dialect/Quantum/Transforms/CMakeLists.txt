@@ -9,3 +9,7 @@ add_public_tablegen_target(MLIRQuantumConvert1QToUPassIncGen)
 set(LLVM_TARGET_DEFINITIONS PrepareForZX.td)
 mlir_tablegen(PrepareForZX.h.inc -gen-rewriters)
 add_public_tablegen_target(MLIRQuantumPrepareForZXPassIncGen)
+
+set(LLVM_TARGET_DEFINITIONS ConstantFolding.td)
+mlir_tablegen(ConstantFolding.h.inc -gen-rewriters)
+add_public_tablegen_target(MLIRConstantFoldingPassIncGen) 

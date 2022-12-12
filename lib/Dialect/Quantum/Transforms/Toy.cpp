@@ -20,11 +20,11 @@ void ToyPass::runOnFunction() {
   FuncOp f = getOperation();
   f.walk([&](Operation *op) {
     // OperationName name = op->getName();
-    if (isa<PauliXGateOp>(op)) {
-      
-    }else{
+    // if (isa<>(op)) {
+      // 
+    // }else{
       // return failure();
-    }
+    // }
     return WalkResult::advance();
   }); 
 }

@@ -24,6 +24,11 @@ def ToyPass : FunctionPass<"toy-pass"> {
   let constructor = "mlir::createToyPass()";
 }
 
+def ConstantFoldingPass: FunctionPass<"constant-folding">{
+  let summary="constant folding";
+  let constructor = "mlir::createConstantFoldingPass()";
+}
+
 // Dynamic Analysis (with updates)
 def QuantumDepthComputePass : FunctionPass<"qssa-compute-depths"> {
   let summary = "Compute circuit depth for all operations";

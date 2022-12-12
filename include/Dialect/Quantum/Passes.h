@@ -11,6 +11,7 @@ std::unique_ptr<FunctionPass> createQuantumRewritePass();
 std::unique_ptr<FunctionPass> createQuantumConvert1QToUPass();
 std::unique_ptr<FunctionPass> createQuantumPrepareForZXPass();
 std::unique_ptr<FunctionPass> createToyPass();
+std::unique_ptr<FunctionPass> createConstantFoldingPass();
 
 
 std::unique_ptr<FunctionPass> createQuantumDepthComputePass();
